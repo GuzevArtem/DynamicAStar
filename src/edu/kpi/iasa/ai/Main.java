@@ -9,7 +9,11 @@ import edu.kpi.iasa.ai.model.AStarWorker;
 import edu.kpi.iasa.ai.model.ObstacleContainer;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
@@ -76,7 +80,12 @@ public class Main {
                     iter++;
                 }
                 zone.setBestPath(Converter.path(worker.getBestPath(),zone));
-                results.setText(results.getText()+"\n"+Arrays.toString(worker.getBestPath().toArray()));
+                results.setText(results.getText()+"\n"+
+                        (worker.getBestPath() == null || worker.getBestPath().size() == 0
+                                ? "No path founded!"
+                                : Arrays.toString(worker.getBestPath().toArray())
+                        )
+                );
                 window.getFrame().repaint();
             }
             catch (Exception e){
@@ -168,10 +177,11 @@ public class Main {
             cancelButton.setEnabled(false);
             clearButton.setEnabled(false);
 
-            window.getFrame().repaint();
-
             startButton.setEnabled(false);
             stopButton.setEnabled(true); //enable stopper
+
+            window.getFrame().repaint();
+
             //starting new thread
             synchronized (executor) {
                 executor.notifyAll();

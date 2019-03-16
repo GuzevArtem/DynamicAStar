@@ -65,6 +65,7 @@ public class AStarWorker {
         distances = new HashMap<>();
         visited = new HashSet<>();
         map = new HashMap<>();
+        path = new ArrayList<>();
     }
 
     public void rebuildVisibilityGraph() {
@@ -99,7 +100,7 @@ public class AStarWorker {
     }
 
     public void start() {
-        clear();
+        init();
         startNode = createNodeOrGet(this.start.getValue().getConnectPoints().getPath().get(0));
         endNode = createNodeOrGet(this.end.getValue().getConnectPoints().getPath().get(0));
         rebuildVisibilityGraph();
@@ -126,7 +127,9 @@ public class AStarWorker {
                 }
 
                 Set<MapNode> neighbors = getNeighbors(current);
-                assert neighbors.size() != 0; //if size == 0 - there are no such location in graph
+                if(neighbors == null || neighbors.size() == 0) {//if size == 0 - there are no such location in graph
+                    return true; //Trying next node
+                }
                 for (MapNode neighbor : neighbors) {
                     if (!visited.contains(neighbor) ){
 
@@ -289,7 +292,12 @@ public class AStarWorker {
             outerEdges.addAll(obst.getValue().getOuterEdges());
             innerEdges.addAll(obst.getValue().getInnerEdges());
         }
-        points.removeIf((p)->{ //removing overlapped points
+        points.removeIf((p)->{
+            //remove point if it`s out of bounds
+            if(!Utils.isInRange(p.x, 0.0, 1.0)
+                    || !Utils.isInRange(p.y, 0.0, 1.0))
+                return true;
+            //removing overlapped points
             for(ConfiguredObstacle obst : obstacleContainer.getObstacles()) {
                 if(obst.isInBounds(p))
                     return true;
